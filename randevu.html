@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Randevu Formu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #e0eafc, #cfdef3);
+      margin: 0;
+      padding: 20px; /* tepeden biraz boşluk bırak */
+      box-sizing: border-box;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 400px;
+      margin: 0 auto 40px auto; /* ortalama ve altta boşluk */
+      box-sizing: border-box;
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: #b30000;
+    }
+
+    .form-container img.logo {
+      width: 100px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .form-group input[type="checkbox"] {
+      vertical-align: middle;
+    }
+
+    .form-group img {
+      width: 100%;
+      max-height: 50px;
+      object-fit: contain;
+      margin-bottom: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #b30000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <img src="dist/img/mylogo.png" alt="Logo" class="logo">
+    <h2>Randevu Formu</h2>
+
+    <form id="randevuForm" onsubmit="return validateForm(event)">
+      <div class="form-group">
+        <label for="tc">T.C Kimlik Numarası</label>
+        <input type="text" id="tc" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+      </div>
+
+      <div class="form-group">
+        <label for="adsoyad">Ad Soyad</label>
+        <input type="text" id="adsoyad" required>
+      </div>
+
+      <div class="form-group">
+  <label for="dogumtarihi">Doğum Tarihi</label>
+  <input type="text" id="dogumtarihi" placeholder="Tarih seçiniz" readonly onclick="showDatePicker()" required>
+
+  <!-- Eski seçim kutuları, silinmedi sadece gizlendi -->
+      <div style="display:none;">
+        <select id="gun">
+          <option value="">Gün</option>
+          ${[...Array(31)].map((_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+        </select>
+        <select id="ay">
+          <option value="">Ay</option>
+          ${["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+            .map((ay, i) => `<option value="${i+1}">${ay}</option>`).join('')}
+        </select>
+        <select id="yil">
+          <option value="">Yıl</option>
+          ${Array.from({length: 100}, (_, i) => 2025 - i).map(yil => `<option value="${yil}">${yil}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+
+      <div class="form-group">
+        <label for="telefon">Telefon</label>
+        <input type="text" id="telefon" value="0" oninput="if(this.value[0] !== '0') this.value = '0' + this.value.slice(1); this.value = this.value.replace(/[^0-9]/g, '')" required>
+      </div>
+
+      <div class="form-group">
+        <label for="hastane">Hastane</label>
+        <select id="hastane" required>
+          <option value="">Seçiniz</option>
+          <option>Medicalpark Mersin</option>
+          <option>Medicalpark Samsun</option>
+          <option>Medicalpark Göztepe</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="doktor">Doktor</label>
+        <select id="doktor" required>
+          <option value="">Seçiniz</option>
+          <option>Prof.Dr.Sami Sökücü</option>
+          <option>Prof.Dr.Abdulkadir Karadede</option>
+          <option>Prof.Dr.Abdulkadir Koçer</option>
+          <option>Prof.Dr.Abdulkerim Bedir</option>
+          <option>Prof.Dr.Abdullah Özyurt</option>
+          <option>Prof.Dr.Ferit Bernay</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="saat">Saat Aralığı</label>
+        <select id="saat" required>
+          <option value="">Seçiniz</option>
+          <option>09:00 - 09:30</option>
+          <option>10:00 - 10:30</option>
+          <option>11:00 - 11:30</option>
+          <option>13:00 - 13:30</option>
+          <option>14:00 - 14:30</option>
+          <option>15:00 - 15:30</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="kvkk" required>
+          KVKK uyarınca ilgili <a href="#">Bilgilendirme</a> 'yi okudum. Kişisel verilerimin belirtilen kapsamda işlenmesini kabul ediyorum.
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="guvenlik">Güvenlik Kodu:</label>
+        <img src="dist/img/guvenlik.png" alt="Güvenlik Kodu">
+        <input type="text" id="guvenlik" required>
+      </div>
+
+      <button type="submit">Randevu Al</button>
+    </form>
+  </div>
+
+  <script>
+    async function validateForm(event) {
+    event.preventDefault(); // formun normal gönderilmesini engelle
+
+    const form = document.getElementById('randevuForm');
+
+    // Gerekli alanları kontrol et
+    const requiredFields = [
+      "tc", "adsoyad", "telefon", "hastane", "doktor", "saat", "guvenlik", "dogumtarihi"
+    ];
+    let isValid = true;
+
+    for (const id of requiredFields) {
+      const field = document.getElementById(id);
+      if (!field || field.value.trim() === "") {
+        isValid = false;
+        break;
+      }
+    }
+
+    // KVKK onayı kontrolü
+    const kvkk = document.getElementById("kvkk");
+    if (!kvkk.checked) {
+      isValid = false;
+    }
+
+    // Güvenlik kodu kontrolü
+    const guvenlik = document.getElementById("guvenlik").value.trim();
+    if (!isValid || guvenlik !== "889416") {
+      Swal.fire({
+        icon: "error",
+        title: "Hata!",
+        text: "Formu eksik ya da hatalı doldurdunuz",
+        footer: '<a href="#">Neden bu hatayı görüyorum?</a>'
+      });
+      return false;
+    }
+
+    // Her şey doğruysa
+    Swal.fire({
+      title: "Randevu Oluşturulmuştur!",
+      icon: "success",
+      draggable: true
+    });
+
+    return true;
+    }
+  </script>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const doktor = params.get("doktor");
+    const hastane = params.get("hastane");
+
+    if (doktor) {
+      const doktorSelect = document.getElementById("doktor");
+      for (const option of doktorSelect.options) {
+        if (option.value === doktor) {
+          option.selected = true;
+          break;
+        }
+      }
+    }
+
+    if (hastane) {
+      const hastaneSelect = document.getElementById("hastane");
+      for (const option of hastaneSelect.options) {
+        if (option.value === hastane) {
+          option.selected = true;
+          break;
+        }
+      }
+    }
+  });
+</script>
+<script>
+  async function showDatePicker() {
+    const { value: date } = await Swal.fire({
+      title: "Doğum Tarihini Seçin",
+      input: "date",
+      inputLabel: "Doğum Tarihi",
+      inputAttributes: {
+        required: true
+      },
+      didOpen: () => {
+        const today = new Date().toISOString();
+        Swal.getInput().max = today.split("T")[0];
+      }
+    });
+
+    if (date) {
+      document.getElementById("dogumtarihi").value = date;
+    }
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
+
